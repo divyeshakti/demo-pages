@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+
+<head>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/4.0.2/bootstrap-material-design.css"
+  />
+  <style>
+    .col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 1px solid black;
+    }
+  </style>
+
+  <script src="../js/zoid.frame.min.js"></script>
+  <script src="../components/form/index.js"></script>
+  <script src="../components/discounts/index.js"></script>
+</head>
+
+<body>
+  <div id="result"></div>
+
+  <div style="display: flex; flex-direction: row; flex-wrap: wrap">
+    <!-- <div class="col">
+      <h2>Basic Example</h2>
+      <div id="login" style="width: 640px; height: 320px"></div>
+    </div> -->
+    <div class="col">
+      <h2>Churning User</h2>
+      <div id="churningUser" style="width: 640px; height: 320px"></div>
+    </div>
+    <div class="col">
+      <h2>New User</h2>
+      <div id="newUser" style="width: 640px; height: 320px"></div>
+    </div>
+    <div class="col">
+      <h2>Normal User</h2>
+      <div id="normalUser" style="width: 640px; height: 320px"></div>
+    </div>
+    <div class="col">
+      <h2>Loyal User</h2>
+      <div id="loyalUser" style="width: 640px; height: 320px"></div>
+    </div>
+    <div class="col">
+      <h2>Default User</h2>
+      <div id="default" style="width: 640px; height: 320px"></div>
+    </div>
+    <div class="col">
+      <h2>Overlay Example</h2>
+      <button id="showOverlay" > show overlay</div>
+    </div>
+  </div>
+
+  <script>
+    // Render the component
+
+    window
+      .MyLoginZoidComponent({
+        prefilledEmail: "foo@bar.com",
+
+        onLogin: function (email) {
+          console.log("User logged in with email:", email);
+          document.querySelector("#result").innerText = email + " logged in!";
+        },
+      })
+      .render("#login");
+    window.renderDiscount = function (queryParams, container) {
+      const queryParamsString = new URLSearchParams(queryParams).toString();
+      window
+        .MyDiscountCoupon({
+          onDiscountApplied: function (discount) {
+            console.log("Discount applied:", discount);
+            document.querySelector("#result").innerText =
+              discount + " discount applied!";
+          },
+          queryProps: {
+            url:'http://localhost:8080/components/discounts?' + queryParamsString,
+          },
+        })
+        .render(container);
+    };
+
+    function createOverlay(element) {
+      const overlay = document.createElement("div");
+      overlay.style.position = "fixed";
+      overlay.style.top = "0";
+      overlay.style.left = "0";
+      overlay.style.width = "100%";
+      overlay.style.height = "100%";
+      overlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+      overlay.style.zIndex = "9999";
+      overlay.appendChild(element);
+      document.body.appendChild(overlay);
+    }
+
+    function createDiv(id, width, height) {
+      const div = document.createElement("div");
+      div.id = id;
+      div.style.backgroundColor = "white";
+      div.style.width = width;
+      div.style.height = height;
+      return div;
+    }
+    function fetchUserInteraction(user ,  div=null){
+      fetch(`http://localhost:3000/api/interact?zid=${user}`)
+          .then((response) => response.json())
+          .then((data) => {
+            // Process the data
+            if (data.queryParams) {
+              window.renderDiscount(data.queryParams, `#${div ?? user}`);
+            }
+          })
+          .catch((error) => {
+            // Handle any errors
+            console.error(error);
+            document.querySelector("#result").innerText = "API call failed!";
+          });
+    }
+
+    (function () {
+      const users = [
+        "churningUser",
+        "newUser",
+        "normalUser",
+        "loyalUser",
+        "default",
+      ];
+
+
+
+      users.forEach((user) => {
+        fetchUserInteraction(user);
+      });
+      document.getElementById("showOverlay").addEventListener("click", function() {
+        createOverlay(createDiv("overlayContent", "640px", "320px"));
+        fetchUserInteraction('churningUser','overlayContent')
+      });
+    })();
+  </script>
+</body>
