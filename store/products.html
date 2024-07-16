@@ -1,0 +1,33 @@
+
+<!DOCTYPE html>
+<header>
+    <!-- <script src="http://localhost:8081/interact.min.js"></script> -->
+    <script type="text/javascript">!function(e,t){var n=t.createElement("script");n.type="text/javascript",n.crossorigin="anonymous",n.async=!0,n.src="http://localhost:8081/interact.min.js",n.onload=function(){};var s=t.getElementsByTagName("script")[0];s.parentNode.insertBefore(n,s);function o(e,t,n){function s(t){e[t]=function(){e[n].push([t].concat(Array.prototype.slice.call(arguments,0)))}}for(var o=0;o<t.length;o++)s(t[o])}var r=e.zeotap||{_q:[],_qcmp:[]};o(r,["init","setEventProperties","setUserProperties","setPageProperties","setMetaProperties","setUserIdentities","unsetUserIdentites","setZI"],"_q"),o(r,["setConsent","addAskForConsentActionListener"],"_qcmp"),e.zeotap=r}(window,document);</script><script type="text/javascript">window.zeotap.init("b8de972e-a754-4c70-90bb-e4384a02551c");</script>
+
+</header>
+<body style="display: flex;flex-direction: column;height: 100vh;padding: unset;margin: unset;">
+    <h1> Products </h1>
+    <main style="flex-grow: 1;">
+
+        <nav>
+            <ul>
+                <li><a href="/store">Home</a></li>
+                <li><a href="/store/cart">Cart</a></li>
+                <li><a href="/store/products">Products</a></li>
+            </ul>
+        </nav>
+
+    </main>
+    <aside style="display: flex; height: 30%; flex-direction: row; gap: 10px;">
+        <label> GAM Event Calls  </label>
+    <div id="gamevents" style="height: 100%;width: 600px; border: 1px solid #000;">
+    </div>
+    <label> GAM Function Calls  </label>
+    <div id="gamfunctions" style="height: 100%;width: 600px; border: 1px solid #000;">
+    </div>
+    </aside>
+
+    <script src="../js/test.js"></script>
+
+</body>
+<html
