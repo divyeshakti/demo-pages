@@ -20,7 +20,7 @@ window.zGAMCallback = function (data) {
 
 window.addEventListener("DOMContentLoaded", () => {
   console.log("DOMContentLoaded event fired");
-  window.zeotapInteract.setUserIdentities({
+  window.zeotap.setUserIdentities({
     email: "divye.m@zeotap.com",
   });
 });
