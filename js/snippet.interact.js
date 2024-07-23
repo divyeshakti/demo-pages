@@ -4,8 +4,8 @@
   // zs.integrity = '';
   zs.crossorigin = "anonymous";
   zs.async = true; // the script is loaded asynchronously
-  //   zs.src = "http://localhost:8081/interact.min.js";
-  zs.src = "https://content.zeotap.com/sdk/qa/interact.min.js";
+  zs.src = "http://localhost:8081/interact.min.js";
+  //   zs.src = "https://content.zeotap.com/sdk/qa/interact.min.js";
   zs.onload = function () {};
 
   var s = doc.getElementsByTagName("script")[0];
@@ -28,4 +28,4 @@
   setUpProxy(zeotapInteract, funcs, "_q");
   win.zeotapInteract = zeotapInteract;
 })(window, document);
-window.zeotapInteract.init("b8de972e-a754-4c70-90bb-e4384a02551c");
+window.zeotapInteract.init("39e82d18-0151-4ba3-84d1-9e3dba037917");

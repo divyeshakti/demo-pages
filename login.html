@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<header>
+    <!-- <script src="http://localhost:8081/interact.min.js"></script> -->
+    <script type="text/javascript" src="./js/snippet.interact.js"></script>
+
+</header>
+<body style="display: flex;flex-direction: column;height: 100vh;padding: unset;margin: unset;">
+    <h1> Home Page  </h1>
+    <main style="flex-grow: 1;">
+        <nav>
+            <ul>
+                <li><a href="/store">Home</a></li>
+                <li><a href="/store/cart">Cart</a></li>
+                <li><a href="/store/products">Products</a></li>
+            </ul>
+        </nav>
+
+        <form onsubmit="return false;"></form>
+            <label for="fieldName">Field Name:</label>
+            <input type="text" id="fieldName" name="fieldName" value="user_email_sha256_lowercase">
+
+            <label for="fieldValue">Field Value:</label>
+            <input type="text" id="fieldValue" name="fieldValue">
+
+            <button id="submit" type="submit">Submit</button>
+        </form>
+    </main>
+    </main>
+    
+
+    <script src="./js/test.js"></script>
+    <script >
+        document.querySelector('#submit').addEventListener('click', function(){
+            var fieldName = document.querySelector('#fieldName').value;
+            var fieldValue = document.querySelector('#fieldValue').value;
+            zeotapInteract.setUserIdentities({[fieldName]:fieldValue});
+            // window.location.href = "/store";
+        });
+
+    </script>   
+</body>
+<html
