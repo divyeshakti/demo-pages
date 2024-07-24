@@ -4,7 +4,7 @@
     (n.crossorigin = "anonymous"),
     (n.async = !0),
     // (n.src = "http://localhost:8081/zeotap.min.js"),
-    (n.src = "https://content.zeotap.com/sdk/qa/zeotap-alpha.min.js"),
+    (n.src = "../js/zeotap.min.js"),
     (n.onload = function () {});
   var s = t.getElementsByTagName("script")[0];
   s.parentNode.insertBefore(n, s);
@@ -43,7 +43,7 @@
   zs.crossorigin = "anonymous";
   zs.async = true; // the script is loaded asynchronously
   //   zs.src = "http://localhost:8081/interact.min.js";
-  zs.src = "https://content.zeotap.com/sdk/qa/interact.min.js";
+  zs.src = "../js/interact.min.js";
 
   zs.onload = function () {};
 
@@ -69,5 +69,5 @@
   win.zeotapInteract = zeotapInteract;
 })(window, document);
 
-window.zeotap.init("b8de972e-a754-4c70-90bb-e4384a02551c");
+window.zeotap.init("39e82d18-0151-4ba3-84d1-9e3dba037917");
 window.zeotapInteract.init();
