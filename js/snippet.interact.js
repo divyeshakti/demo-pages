@@ -4,8 +4,8 @@
   // zs.integrity = '';
   zs.crossorigin = "anonymous";
   zs.async = true; // the script is loaded asynchronously
-  zs.src = "http://localhost:8081/interact.min.js";
-  //   zs.src = "https://content.zeotap.com/sdk/qa/interact.min.js";
+  //   zs.src = "http://localhost:8081/interact.min.js";
+  zs.src = "https://content.zeotap.com/sdk/qa/interact.min.js";
   zs.onload = function () {};
 
   var s = doc.getElementsByTagName("script")[0];
