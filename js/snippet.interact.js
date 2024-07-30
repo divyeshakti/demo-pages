@@ -6,7 +6,7 @@ function getQueryParams() {
     var param = params[i].split("=");
     var key = decodeURIComponent(param[0]);
     var value = decodeURIComponent(param[1]);
-    queryParams[key] = value;
+    if (!!key && value !== undefined) queryParams[key] = value;
   }
   return queryParams;
 }
@@ -14,7 +14,7 @@ function getQueryParams() {
 function setQueryParams(params) {
   var queryString = "";
   for (var key in params) {
-    if (params.hasOwnProperty(key)) {
+    if (key !== undefined && params.hasOwnProperty(key)) {
       var value = encodeURIComponent(params[key]);
       queryString += key + "=" + value + "&";
     }
@@ -55,12 +55,21 @@ function getWriteKey(env = "qa") {
   var params = getQueryParams();
 
   var storage = getSessionStorage();
-  if (params["env"]) {
+  if (!!params["env"]) {
     storage["env"] = params["env"];
     setSessionStorage(storage);
   } else {
     if (storage["env"]) {
-      setQueryParams({ env: storage["env"] });
+      setQueryParams({ ...getQueryParams(), env: storage["env"] });
+    }
+  }
+
+  if (!!params["writekey"]) {
+    storage["writekey"] = params["writekey"];
+    setSessionStorage(storage);
+  } else {
+    if (storage["writekey"]) {
+      setQueryParams({ ...getQueryParams(), writekey: storage["writekey"] });
     }
   }
 
@@ -93,6 +102,9 @@ function getWriteKey(env = "qa") {
   var zeotapInteract = win.zeotapInteract || { _q: [] };
   setUpProxy(zeotapInteract, funcs, "_q");
   win.zeotapInteract = zeotapInteract;
-  const writeKey = getWriteKey(storage["env"] || "qa");
+
+  const writeKey = !!storage["writekey"]
+    ? storage["writekey"]
+    : getWriteKey(storage["env"] || "qa");
   window.zeotapInteract.init(writeKey);
 })(window, document);
