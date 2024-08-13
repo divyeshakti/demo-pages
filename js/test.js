@@ -1,13 +1,3 @@
-// window.addEventListener("sendGAMessage", function ($event) {
-//   console.log("event.data: ", JSON.stringify($event.detail));
-//   var resp = JSON.stringify($event.detail);
-//   const div = document.querySelector("#gamevents");
-//   const elem = document.createElement("p");
-//   elem.textContent = resp;
-//   div.appendChild(elem);
-//   //   div.textContent = resp;
-// });
-
 function getQueryParams() {
   var queryParams = {};
   var queryString = window.location.search.substring(1);
@@ -49,9 +39,28 @@ function setSessionStorage(data) {
   sessionStorage.setItem("zeotapInteract", JSON.stringify(data));
 }
 
+window.addEventListener("sendGAMessage", function ($event) {
+  console.log("event.data: ", JSON.stringify($event.detail));
+  var resp = " sendGAMessage: " + JSON.stringify($event.detail);
+  const div = document.querySelector("#gamfunctions");
+  const elem = document.createElement("p");
+  elem.textContent = resp;
+  div.appendChild(elem);
+  //   div.textContent = resp;
+});
+
 window.zGAMCallback = function (data) {
   console.log("zGAMCallback: ", JSON.stringify(data));
-  var resp = JSON.stringify(data);
+  var resp = "zGAMCallback :" + JSON.stringify(data);
+  const div = document.querySelector("#gamfunctions");
+  const elem = document.createElement("p");
+  elem.textContent = resp;
+  div.appendChild(elem);
+  //   div.textContent = resp;
+};
+window.zeotapGAMCallback = function (data) {
+  console.log("zeotapGAMCallback: ", JSON.stringify(data));
+  var resp = "zeotapGAMCallback :" + JSON.stringify(data);
   const div = document.querySelector("#gamfunctions");
   const elem = document.createElement("p");
   elem.textContent = resp;
@@ -82,10 +91,6 @@ document
 window.addEventListener("DOMContentLoaded", () => {
   console.log("DOMContentLoaded event fired");
   displayIdentities();
-
-  // window.zeotapInteract.setUserIdentities({
-  //   email: "divye.m@zeotap.com",
-  // });
 });
 
 function displayIdentities() {
