@@ -80,7 +80,7 @@ function getWriteKey(env = "qa") {
   }
 
   //   zs.src = "http://localhost:8081/interact.min.js";
-
+  // this is just to trigger again
   zs.onload = function () {};
 
   var s = doc.getElementsByTagName("script")[0];
