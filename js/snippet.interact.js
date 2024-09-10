@@ -43,6 +43,7 @@ function getWriteKey(env = "qa") {
   return {
     qa: "39e82d18-0151-4ba3-84d1-9e3dba037917",
     staging: "5d8ce731-f41d-44a7-a9e8-9a6713b67404",
+    production: "a78d6ac7-b46c-4afb-80a1-0da83cdd32df",
   }[env];
 }
 
@@ -73,7 +74,10 @@ function getWriteKey(env = "qa") {
     }
   }
 
-  if (storage["env"] === "staging") {
+  if (storage["env"] === "production") {
+    zs.src =
+      "https://content.zeotap.com/sdk/interact.min.js" + `?v=${Date.now()}`;
+  } else if (storage["env"] === "staging") {
     zs.src = "../js/staging/interact.min.js";
   } else {
     zs.src = "../js/interact.min.js";
