@@ -49,23 +49,45 @@ window.addEventListener("sendGAMessage", function ($event) {
   //   div.textContent = resp;
 });
 
-window.zGAMCallback = function (data) {
-  console.log("zGAMCallback: ", JSON.stringify(data));
-  var resp = "zGAMCallback :" + JSON.stringify(data);
-  const div = document.querySelector("#gamfunctions");
+window.addToBox = function (resp) {
+  const div = document.querySelector("#interactions");
   const elem = document.createElement("p");
   elem.textContent = resp;
   div.appendChild(elem);
-  //   div.textContent = resp;
 };
-window.zeotapGAMCallback = function (data) {
-  console.log("zeotapGAMCallback: ", JSON.stringify(data));
-  var resp = "zeotapGAMCallback :" + JSON.stringify(data);
-  const div = document.querySelector("#gamfunctions");
-  const elem = document.createElement("p");
-  elem.textContent = resp;
-  div.appendChild(elem);
-  //   div.textContent = resp;
+
+// window.zeoParamsCallback = function (data) {
+//   console.log("zeoParamsCallback: ", JSON.stringify(data));
+//   var resp = "zeoParamsCallback :" + JSON.stringify(data);
+//   window.addToBox(resp);
+//   //   div.textContent = resp;
+// };
+
+// flag holding callback state
+window.zeoParamsCallbackCalled = false;
+
+// fail-safe after 2 seconds
+// setTimeout(function () {
+//   window.zeoParamsCallback({});
+// }, 2000);
+
+window.zeoParamsCallback = function (targetingParameters) {
+  if (window.zeoParamsCallbackCalled) {
+    // callback already called
+    return;
+  }
+  window.zeoParamsCallbackCalled = true;
+
+  // Your implementation of the values sent in targettingParameters.
+  console.log("zeoParamsCallback: ", JSON.stringify(targetingParameters));
+  var resp = "zeoParamsCallback :" + JSON.stringify(targetingParameters);
+  window.addToBox(resp);
+  // Your existing Google Ad Manager code should go here but be sure to include the following
+  // targeting directives that will push the BlueConic data to Google Ad Manager:
+  //
+  //  jQuery.each(targetingParameters, function(index, param) {
+  //    window.googletag.pubads().setTargeting(param.key, param.value);
+  //  });
 };
 
 document.querySelector("#submit").addEventListener("click", function () {
@@ -107,3 +129,18 @@ function displayIdentities() {
     }
   }
 }
+
+function readAndShowStorage() {
+  if (typeof Storage !== "undefined") {
+    var targetingParamStr = localStorage.getItem("zeoParamsStoreLocal");
+
+    if (targetingParamStr) {
+      // Do your processing
+      // make targetting using targetting Params
+      console.log("zeoParamsStoreLocal: ", targetingParamStr);
+      var resp = "zeoParamsStoreLocal :" + targetingParamStr;
+      window.addToBox(resp);
+    }
+  }
+}
+readAndShowStorage();

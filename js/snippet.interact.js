@@ -80,7 +80,9 @@ function getWriteKey(env = "qa") {
   } else if (storage["env"] === "staging") {
     zs.src = "../js/staging/interact.min.js";
   } else {
-    zs.src = "../js/interact.min.js";
+    zs.src =
+      "https://content.zeotap.com/sdk/qa/interact.min.js" + `?v=${Date.now()}`;
+    // zs.src = "../js/interact.min.js";
   }
 
   //   zs.src = "http://localhost:8081/interact.min.js";
