@@ -70,8 +70,9 @@ window.zeoParamsCallbackCalled = false;
 // setTimeout(function () {
 //   window.zeoParamsCallback({});
 // }, 2000);
-
+var prevCallback = window.zeoParamsCallback;
 window.zeoParamsCallback = function (targetingParameters) {
+  if (prevCallback) prevCallback(targetingParameters);
   if (window.zeoParamsCallbackCalled) {
     // callback already called
     return;
@@ -85,6 +86,37 @@ window.zeoParamsCallback = function (targetingParameters) {
   // Your existing Google Ad Manager code should go here but be sure to include the following
   // targeting directives that will push the BlueConic data to Google Ad Manager:
   //
+  if (
+    window.adobe &&
+    adobe.target &&
+    typeof adobe.target.getOffers === "function"
+  ) {
+    const req = {
+      request: {
+        prefetch: {
+          views: [
+            {
+              parameters: targetingParameters,
+            },
+          ],
+        },
+      },
+    };
+
+    adobe.target.getOffers(req);
+
+    // adobe.target.getOffer({
+    //   params: targetingParameters,
+    //   success: function (offer) {
+    //     adobe.target.applyOffer({
+    //       offer: offer,
+    //     });
+    //   },
+    //   error: function (status, error) {
+    //     console.log("Error", status, error);
+    //   },
+    // });
+  }
   //  jQuery.each(targetingParameters, function(index, param) {
   //    window.googletag.pubads().setTargeting(param.key, param.value);
   //  });

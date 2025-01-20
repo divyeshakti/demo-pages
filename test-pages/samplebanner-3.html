@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Popup Banner</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+      }
+
+      .popup-banner {
+        /* position: fixed;
+        bottom: 0;
+        left: 0; */
+
+        width: 100%;
+        background-color: #f9f9f9;
+        box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+
+      .popup-banner h3 {
+        margin: 0;
+        font-size: 1.5em;
+        color: #333;
+      }
+
+      .popup-banner p {
+        margin: 10px 0;
+        font-size: 1em;
+        color: #666;
+        text-align: center;
+        max-width: 800px;
+      }
+
+      .popup-banner .button-group {
+        margin-top: 15px;
+        display: flex;
+        gap: 10px;
+      }
+
+      .popup-banner button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 1em;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      .popup-banner button:nth-child(1) {
+        background-color: #ddd;
+        color: #333;
+      }
+
+      .popup-banner button:nth-child(1):hover {
+        background-color: #ccc;
+      }
+
+      .popup-banner button:nth-child(2) {
+        background-color: #0078d4;
+        color: white;
+      }
+
+      .popup-banner button:nth-child(2):hover {
+        background-color: #005fa3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="popup-banner">
+      <h3>Make It Your Own</h3>
+      <p>
+        Adobe and its vendors use cookies and similar technologies to improve
+        your experience and measure your interactions with our websites,
+        products, and services. We also use them to provide you more relevant
+        information in searches and in ads on this and other sites. If that’s
+        okay, click "Enable all". Clicking "Don’t enable" will set only cookies
+        that are strictly necessary. You can also view our vendors and customize
+        your choices by clicking "Cookie Settings".
+      </p>
+      <div class="button-group">
+        <button>Cookie Settings</button>
+        <button>Don’t Enable</button>
+        <button>Enable All</button>
+      </div>
+    </div>
+  </body>
+</html>
