@@ -11,6 +11,9 @@
       body {
         margin: 0;
         font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        height: 100%;
+
       }
 
       .popup-banner {
@@ -18,7 +21,8 @@
         bottom: 0;
         left: 0; */
         width: 100%;
-        background-color: #f9f9f9;
+        height: 100%;
+        overflow: hidden;
         box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
         padding: 20px;
         display: flex;
@@ -81,19 +85,12 @@
   <body>
     <div class="popup-banner">
       <h3>Make It Your Own</h3>
-      <p>
+      <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></p>
         Adobe and its vendors use cookies and similar technologies to improve
-        your experience and measure your interactions with our websites,
-        products, and services. We also use them to provide you more relevant
-        information in searches and in ads on this and other sites. If that’s
-        okay, click "Enable all". Clicking "Don’t enable" will set only cookies
-        that are strictly necessary. You can also view our vendors and customize
-        your choices by clicking "Cookie Settings".
+        your experience 
       </p>
       <div class="button-group">
         <button>Cookie Settings</button>
-        <button>Don’t Enable</button>
-        <button>Enable All</button>
       </div>
     </div>
   </body>

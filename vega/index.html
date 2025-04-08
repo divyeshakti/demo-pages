@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Responsive Cumulative Events Chart</title>
+  <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    #vis {
+      width: 100%;
+      height: 100vh;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="vis"></div>
+
+  <script>
+    const spec = {
+      "$schema": "https://vega.github.io/schema/vega/v5.json",
+      "autosize": { "type": "fit", "contains": "padding" },
+      "padding": 5,
+      "signals": [
+        { "name": "width", "update": "containerSize()[0]" },
+        { "name": "height", "update": "containerSize()[1]" }
+      ],
+
+      "data": [
+        {
+          "name": "table",
+          "values": [
+            {"date": "2024-03-01", "source": "API", "value": 0},
+            {"date": "2024-03-01", "source": "Batch", "value": 1000},
+            {"date": "2024-03-01", "source": "Stream", "value": 0},
+
+            {"date": "2024-04-01", "source": "API", "value": 500},
+            {"date": "2024-04-01", "source": "Batch", "value": 2000},
+            {"date": "2024-04-01", "source": "Stream", "value": 0},
+
+            {"date": "2024-07-01", "source": "Stream", "value": 200000},
+            {"date": "2024-08-01", "source": "Stream", "value": 250000},
+            {"date": "2024-09-01", "source": "Stream", "value": 875000},
+            {"date": "2025-01-01", "source": "Stream", "value": 900000},
+
+            {"date": "2025-03-01", "source": "API", "value": 10000},
+            {"date": "2025-03-01", "source": "Batch", "value": 20000},
+            {"date": "2025-03-01", "source": "Stream", "value": 900000}
+          ],
+          "format": {"type": "json", "parse": {"date": "date"}}
+        }
+      ],
+
+      "scales": [
+        {
+          "name": "x",
+          "type": "time",
+          "domain": {"data": "table", "field": "date"},
+          "range": [0, { "signal": "width" }]
+        },
+        {
+          "name": "y",
+          "type": "linear",
+          "domain": {"data": "table", "field": "value"},
+          "range": [{ "signal": "height" }, 0],
+          "nice": true,
+          "zero": true
+        },
+        {
+          "name": "color",
+          "type": "ordinal",
+          "domain": ["API", "Batch", "Stream"],
+          "range": ["#1f77b4", "#ff7f0e", "#2ca02c"]
+        }
+      ],
+
+      "axes": [
+        {"orient": "bottom", "scale": "x", "format": "%b %y", "labelAngle": -45},
+        {"orient": "left", "scale": "y", "title": "Cumulative Events"}
+      ],
+
+      "legends": [
+        {
+          "fill": "color",
+          "title": "Source",
+          "orient": "bottom-right"
+        }
+      ],
+
+      "marks": [
+        {
+          "type": "group",
+          "from": {
+            "facet": {
+              "name": "series",
+              "data": "table",
+              "groupby": "source"
+            }
+          },
+          "marks": [
+            {
+              "type": "line",
+              "from": {"data": "series"},
+              "encode": {
+                "enter": {
+                  "x": {"scale": "x", "field": "date"},
+                  "y": {"scale": "y", "field": "value"},
+                  "stroke": {"scale": "color", "field": "source"},
+                  "strokeWidth": {"value": 2}
+                }
+              }
+            },
+            {
+              "type": "symbol",
+              "from": {"data": "series"},
+              "encode": {
+                "enter": {
+                  "x": {"scale": "x", "field": "date"},
+                  "y": {"scale": "y", "field": "value"},
+                  "fill": {"scale": "color", "field": "source"},
+                  "size": {"value": 50},
+                  "tooltip": {
+                    "signal": "{'Date': timeFormat(datum.date, '%b %Y'), 'Source': datum.source, 'Value': format(datum.value, ',')}"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    };
+
+    vegaEmbed("#vis", spec, { actions: false }).catch(console.error);
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Embedding Vega-Lite</title>
+    <script src="https://cdn.jsdelivr.net/npm/vega@5.30.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.21.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.26.0"></script>
+  </head>
+  <body>
+    <div id="vis"></div>
+
+    <script type="text/javascript">
+      var yourVlSpec = {
+        $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+        description: 'A simple bar chart with embedded data.',
+        "title": "Distribution of Event Counts",
+          "encoding": {
+            "y": {
+              "field": "event_count",
+              "title": "Event Count",
+              "type": "quantitative",
+              "axis": {
+                "labelOverlap": true
+              }
+            },
+            "x": {
+              "field": "event_name",
+              "title": "Event Name",
+              "type": "nominal",
+              "axis": {
+                "labelOverlap": true
+              },
+              "sort": "ascending"
+            }
+          },
+          "mark": {
+            "type": "bar"
+          },
+          "data": {
+            "values": [
+              {
+                "event_count": 2504249.0,
+                "event_name": ""
+              },
+              {
+                "event_count": 566029.0,
+                "event_name": "add_payment_info"
+              },
+              {
+                "event_count": 565412.0,
+                "event_name": "add_to_cart"
+              },
+              {
+                "event_count": 564678.0,
+                "event_name": "view_item"
+              },
+              {
+                "event_count": 547858.0,
+                "event_name": "add_to_wishlist"
+              }
+            ]
+          }
+      };
+      vegaEmbed('#vis', yourVlSpec);
+    </script>
+  </body>
+</html>

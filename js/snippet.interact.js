@@ -156,7 +156,8 @@ preMain();
     zs.src =
       "https://content.zeotap.com/sdk/qa/interact.min.js" + `?v=${Date.now()}`;
   } else {
-    zs.src = "../js/display/interact.min.js";
+    // zs.src = "../js/display/interact.min.js";
+    zs.src = "http://localhost:8081/interact.min.js";
   }
 
   // this is just to trigger again
