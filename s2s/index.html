@@ -241,6 +241,10 @@
                     <label for="userId">User ID</label>
                     <input type="text" id="userId" name="userId" required placeholder="Enter your user ID">
                 </div>
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="number" id="age" name="age" required min="18" max="120" placeholder="Enter your age">
+                </div>
                 <div class="date-group">
                     <div class="form-group">
                         <label for="checkin_date">Check-in Date</label>
@@ -362,7 +366,7 @@
                     url: "https://www.thon.no/"
                 },
                 user: {
-                    age: 35,
+                    age: parseInt(document.getElementById('age').value, 10),
                     userId: document.getElementById('userId').value,
                     country: document.getElementById('country_code').value,
                     email: document.getElementById('email').value,
