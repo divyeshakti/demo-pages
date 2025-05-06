@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>External API Call Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 to-gray-800 text-white flex flex-col items-center pt-20">
+    <h1 class="text-4xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500">
+        External API Call Demo
+    </h1>
+
+    <div class="space-y-4">
+
+        <button id="zeotapButton" class="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-6 py-3 rounded-full hover:from-green-600 hover:to-emerald-600 transition-all duration-300 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+            Call Zeotap API
+        </button>
+
+        <div id="zeotapData" class="bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/20 shadow-lg max-w-md hidden">
+            <h2 class="text-2xl font-semibold mb-4 text-green-300">Zeotap API Response:</h2>
+            <pre class="text-gray-200 overflow-auto max-h-64"></pre>
+        </div>
+
+        <div id="errorContainer" class="border-red-500 bg-red-900/50 text-red-300 p-4 rounded-md hidden flex items-start gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-alert-circle"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+            <div>
+                <h2 class="font-semibold">Error</h2>
+                <p id="errorMessage"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const zeotapButton = document.getElementById('zeotapButton');
+        const zeotapDataContainer = document.getElementById('zeotapData');
+        const errorContainer = document.getElementById('errorContainer');
+        const errorMessageDisplay = document.getElementById('errorMessage');
+
+        function showLoading(buttonId) {
+            const button = document.getElementById(buttonId);
+            button.textContent = 'Loading...';
+            button.disabled = true;
+        }
+
+        function hideLoading(buttonId) {
+            const button = document.getElementById(buttonId);
+            let buttonText = '';
+            switch (buttonId) {
+                case 'rickAndMortyButton':
+                    buttonText = 'Fetch Rick and Morty Character';
+                    break;
+                case 'ipButton':
+                    buttonText = 'Fetch My IP Address';
+                    break;
+                case 'zeotapButton':
+                    buttonText = 'Call Zeotap API';
+                    break;
+                default:
+                    buttonText = '';
+            }
+            button.textContent = buttonText;
+            button.disabled = false;
+        }
+
+        function displayError(message) {
+            errorContainer.classList.remove('hidden');
+            errorMessageDisplay.textContent = message;
+        }
+
+        function hideError() {
+            errorContainer.classList.add('hidden');
+            errorMessageDisplay.textContent = '';
+        }
+
+        zeotapButton.addEventListener('click', () => {
+            showLoading('zeotapButton');
+            hideError();
+            zeotapDataContainer.classList.add('hidden');
+
+            const payload = {
+                "event": {
+                    "eventName": "checkin",
+                    "event_label": "hotel",
+                    "hotelLocation": "Panorama",
+                    "bookingID": 423584,
+                    "country": "NOR",
+                    "eventTimestamp": 1746189594000
+                },
+                "page": {
+                    "url": "https://www.thon.no/"
+                },
+                "user": {
+                    "age": 35,
+                    "userId": "1234567890",
+                    "country": "NOR",
+                    "email": "alasdaircmwork@gmail.com",
+                    "test": "true",
+                    "first_name": "Alasdair",
+                    "last_name": "Cameron"
+                },
+                "consent": {
+                    "marketing": "Yes",
+                    "personalisation": "Yes",
+                    "email": "Yes"
+                }
+            };
+
+            fetch('https://spl.zeotap.com/fp?region=EU&eventType=s2s', {
+                method: 'POST',
+                headers: {
+                    'Accept-Charset': 'UTF-8',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Basic d19rOmM4YzA3NTkyLWJhYzEtNGEzMy1iYzQyLThlOTQyMWM3ZTZjYg==', //  Replace with your actual authorization token
+                    'Cookie': 'zc=f4c84c11-e244-49d3-57b3-75cca6f497ee; zuc={%224297%22%3A{%22v%22%3A%22ALL%22%2C%22p%22%3A%22ALL%22%2C%22t%22%3A1731076739%7D%7D'
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                zeotapDataContainer.classList.remove('hidden');
+                const pre = zeotapDataContainer.querySelector('pre');
+                pre.textContent = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                displayError(error.message);
+            })
+            .finally(() => {
+                hideLoading('zeotapButton');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "tc-string-parse": "^1.3.0"
+  }
+}

@@ -138,51 +138,51 @@ preMain();
     (e.zeotap = r);
 })(window, document);
 
-(function (win, doc) {
-  var zs = doc.createElement("script");
-  zs.type = "text/javascript";
-  // zs.integrity = '';
-  zs.crossorigin = "anonymous";
-  zs.async = true; // the script is loaded asynchronously
-  var params = getQueryParams();
-  var storage = getSessionStorage();
+// (function (win, doc) {
+//   var zs = doc.createElement("script");
+//   zs.type = "text/javascript";
+//   // zs.integrity = '';
+//   zs.crossorigin = "anonymous";
+//   zs.async = true; // the script is loaded asynchronously
+//   var params = getQueryParams();
+//   var storage = getSessionStorage();
 
-  if (storage["env"] === "production") {
-    zs.src =
-      "https://content.zeotap.com/sdk/interact.min.js" + `?v=${Date.now()}`;
-  } else if (storage["env"] === "staging") {
-    zs.src = "../js/staging/interact.min.js";
-  } else if (storage["env"] === "qa") {
-    zs.src =
-      "https://content.zeotap.com/sdk/qa/interact.min.js" + `?v=${Date.now()}`;
-  } else {
-    // zs.src = "../js/display/interact.min.js";
-    zs.src = "http://localhost:8081/interact.min.js";
-  }
+//   if (storage["env"] === "production") {
+//     zs.src =
+//       "https://content.zeotap.com/sdk/interact.min.js" + `?v=${Date.now()}`;
+//   } else if (storage["env"] === "staging") {
+//     zs.src = "../js/staging/interact.min.js";
+//   } else if (storage["env"] === "qa") {
+//     zs.src =
+//       "https://content.zeotap.com/sdk/qa/interact.min.js" + `?v=${Date.now()}`;
+//   } else {
+//     // zs.src = "../js/display/interact.min.js";
+//     zs.src = "http://localhost:8080/interact.min.js";
+//   }
 
-  // this is just to trigger again
-  zs.onload = function () {};
+//   // this is just to trigger again
+//   zs.onload = function () {};
 
-  var s = doc.getElementsByTagName("script")[0];
-  s.parentNode.insertBefore(zs, s);
-  var funcs = ["init", "setUserIdentities", "getUserIdentities"];
-  function setUpProxy(instance, functions, queue) {
-    function proxyMain(fn) {
-      instance[fn] = function () {
-        // all arguments should be appended with the default call that needs to recorded per call
-        instance[queue].push(
-          [fn].concat(Array.prototype.slice.call(arguments, 0))
-        );
-      };
-    }
-    for (var k = 0; k < functions.length; k++) {
-      proxyMain(functions[k]);
-    }
-  }
-  var zeotapInteract = win.zeotapInteract || { _q: [] };
-  setUpProxy(zeotapInteract, funcs, "_q");
-  win.zeotapInteract = zeotapInteract;
-})(window, document);
+//   var s = doc.getElementsByTagName("script")[0];
+//   s.parentNode.insertBefore(zs, s);
+//   var funcs = ["init", "setUserIdentities", "getUserIdentities"];
+//   function setUpProxy(instance, functions, queue) {
+//     function proxyMain(fn) {
+//       instance[fn] = function () {
+//         // all arguments should be appended with the default call that needs to recorded per call
+//         instance[queue].push(
+//           [fn].concat(Array.prototype.slice.call(arguments, 0))
+//         );
+//       };
+//     }
+//     for (var k = 0; k < functions.length; k++) {
+//       proxyMain(functions[k]);
+//     }
+//   }
+//   var zeotapInteract = win.zeotapInteract || { _q: [] };
+//   setUpProxy(zeotapInteract, funcs, "_q");
+//   win.zeotapInteract = zeotapInteract;
+// })(window, document);
 
 function main() {
   var params = getQueryParams();
@@ -194,10 +194,13 @@ function main() {
   if (mode === "default") {
     window.zeotapInteract.init(writeKey);
   } else if (mode === "collect") {
-    window.zeotap.init(writeKey);
-    window.zeotapInteract.init();
-    window.zeotapInteract.init = window.zeotap.init;
-    window.zeotapInteract.setUserIdentities = window.zeotap.setUserIdentities;
+    window.zeotap.init(writeKey,{
+      // loadInteractScript: ,
+      debug:true,
+    });
+    // window.zeotapInteract.init();
+    // window.zeotapInteract.init = window.zeotap.init;
+    // window.zeotapInteract.setUserIdentities = window.zeotap.setUserIdentities;
   }
 }
 
