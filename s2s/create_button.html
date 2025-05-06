@@ -133,8 +133,11 @@
                 // Convert to base64
                 const base64Payload = btoa(JSON.stringify(completePayload));
                 
-                // Generate URL
-                const currentHost = window.location.origin;
+                // Generate URL with special case for github.io
+                let currentHost = window.location.origin;
+                if (window.location.hostname === 'https://divyeshakti.github.io') {
+                    currentHost = currentHost + '/demo-pages';
+                }
                 const url = `${currentHost}/s2s/button?payload=${base64Payload}`;
                 
                 // Display result as a clickable link
