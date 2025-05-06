@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S2S API Call</title>
+</head>
+<body>
+    <div id="content">
+        <button onclick="makeApiCall()">Send Request</button>
+        <div id="response"></div>
+    </div>
+
+    <script>
+        // Function to get query parameters from URL
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // Function to decode base64
+        function decodeBase64Payload(encodedPayload) {
+            try {
+                const decodedString = atob(encodedPayload);
+                return JSON.parse(decodedString);
+            } catch (error) {
+                console.error('Error decoding payload:', error);
+                return null;
+            }
+        }
+
+        async function makeApiCall() {
+            try {
+                // Get the encoded payload from URL
+                const encodedPayload = getQueryParam('payload');
+                if (!encodedPayload) {
+                    throw new Error('No payload found in URL parameters');
+                }
+
+                // Decode the payload
+                const payload = decodeBase64Payload(encodedPayload);
+                if (!payload || !payload.writeKey || !payload.body) {
+                    throw new Error('Invalid payload structure');
+                }
+
+                const { writeKey, body } = payload;
+                const encodedWriteKey = btoa('w_k:' + writeKey);
+
+                const response = await fetch('https://spl.zeotap.com/fp?region=EU&eventType=s2s', {
+                    method: 'POST',
+                    headers: {
+                        'Accept-Charset': 'UTF-8',
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Basic ' + encodedWriteKey,
+                        'Cookie': 'zc=;'
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                alert('Request successful!');
+                document.getElementById('response').textContent = 'Request sent successfully!';
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('response').textContent = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

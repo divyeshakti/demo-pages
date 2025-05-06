@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S2S Button Creator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        textarea {
+            min-height: 200px;
+            font-family: monospace;
+        }
+        .error {
+            color: red;
+            margin-top: 5px;
+            display: none;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f5e9;
+            border-radius: 4px;
+            display: none;
+        }
+        #generatedUrl {
+            word-break: break-all;
+        }
+        #generatedUrl a {
+            color: #2196F3;
+            text-decoration: none;
+        }
+        #generatedUrl a:hover {
+            text-decoration: underline;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>S2S Button Creator</h1>
+        <div class="form-group">
+            <label for="writeKey">Write Key:</label>
+            <input type="text" id="writeKey" placeholder="Enter your write key">
+        </div>
+        <div class="form-group">
+            <label for="payload">JSON Payload:</label>
+            <textarea id="payload" placeholder="Enter your JSON payload"></textarea>
+            <div id="jsonError" class="error">Invalid JSON format</div>
+        </div>
+        <div class="button-group">
+            <button onclick="prettifyJSON()">Prettify JSON</button>
+            <button onclick="generateUrl()">Generate URL</button>
+        </div>
+        <div id="result" class="result">
+            <h3>Generated URL:</h3>
+            <p id="generatedUrl"></p>
+        </div>
+    </div>
+
+    <script>
+        function prettifyJSON() {
+            const textarea = document.getElementById('payload');
+            const errorDiv = document.getElementById('jsonError');
+            
+            try {
+                const json = JSON.parse(textarea.value);
+                textarea.value = JSON.stringify(json, null, 2);
+                errorDiv.style.display = 'none';
+            } catch (e) {
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        function generateUrl() {
+            const writeKey = document.getElementById('writeKey').value.trim();
+            const payloadText = document.getElementById('payload').value.trim();
+            const resultDiv = document.getElementById('result');
+            const generatedUrlDiv = document.getElementById('generatedUrl');
+            const errorDiv = document.getElementById('jsonError');
+
+            try {
+                // Validate JSON
+                const payloadJson = JSON.parse(payloadText);
+                
+                // Create the complete payload object
+                const completePayload = {
+                    writeKey: writeKey,
+                    body: payloadJson
+                };
+
+                // Convert to base64
+                const base64Payload = btoa(JSON.stringify(completePayload));
+                
+                // Generate URL
+                const currentHost = window.location.origin;
+                const url = `${currentHost}/s2s/button?payload=${base64Payload}`;
+                
+                // Display result as a clickable link
+                resultDiv.style.display = 'block';
+                generatedUrlDiv.innerHTML = `<a href="${url}" target="_blank">${url}</a>`;
+                errorDiv.style.display = 'none';
+            } catch (e) {
+                errorDiv.style.display = 'block';
+                resultDiv.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
