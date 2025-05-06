@@ -237,6 +237,10 @@
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" required placeholder="Enter your email address">
                 </div>
+                <div class="form-group">
+                    <label for="userId">User ID</label>
+                    <input type="text" id="userId" name="userId" required placeholder="Enter your user ID">
+                </div>
                 <div class="date-group">
                     <div class="form-group">
                         <label for="checkin_date">Check-in Date</label>
@@ -359,7 +363,7 @@
                 },
                 user: {
                     age: 35,
-                    userId: "1234567890",
+                    userId: document.getElementById('userId').value,
                     country: document.getElementById('country_code').value,
                     email: document.getElementById('email').value,
                     first_name: document.getElementById('first_name').value,
