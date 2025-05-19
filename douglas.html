@@ -1,57 +1,83 @@
 <!DOCTYPE html>
 
-<script>
-    window.zeoParamsCallbackCalled = false;
-    // fail-safe after 2 seconds
-    setTimeout(function () {
-        window.zeoParamsCallback({}); // Add default details if needed.
-    }, 2000);
 
-    window.zeoParamsCallback = function (targetingParameters) {
-        if (window.zeoParamsCallbackCalled) {
-            // callback already called
-            return;
-        }
-        window.zeoParamsCallbackCalled = true;
-        //put your consuming platform's code here
+
+<header>
+    <script>
+    
         window.kameleoonQueue = window.kameleoonQueue || [];
-        for (var key in targetingParameters) {
-            if (targetingParameters[key]!== null && targetingParameters[key] !== undefined) {
-                window.kameleoonQueue.push(['Kameleoon.API.Data.setCustomData', key, targetingParameters[key]]);
+        if (typeof Kameleoon === 'undefined') {
+                    var d = document;
+                    t = d.createElement("script");
+                    t.language = "javascript";
+                    t.type = "text/javascript";
+                    t.charset = "utf-8";
+                    t.setAttribute("src", "https://www.douglas.de/testing/kameleoon.js");
+                    tn = d.getElementsByTagName("script")[0];
+                    if (tn) {
+                        tn.parentNode.insertBefore(t, tn);
+                    }
+        }
+    </script>
+    
+    <script>
+        window.zeoParamsCallbackCalled = false;
+
+        // Check and process existing data in localStorage
+        const storedZeoParams = localStorage.getItem('zeotaopKameleoonCustomData');
+        if (storedZeoParams) {
+            try {
+            const zeoParams = JSON.parse(atob(storedZeoParams));
+            
+            Object.entries(zeoParams).forEach(([key, value]) => {
+                if (value !== null && value !== undefined) {
+                console.log('Pushing to Kameleoon:', key, value);
+
+                window.kameleoonQueue.push(['Kameleoon.API.Data.setCustomData', key, value, true]);
+                }
+            });
+            } catch (error) {
+            console.error('Error parsing stored ZeoParams:', error);
             }
         }
 
-    };
-</script>
- 
+        // Fail-safe to ensure callback is triggered after 2 seconds
+        setTimeout(() => {
+            if (!window.zeoParamsCallbackCalled) {
+            window.zeoParamsCallback({});
+            }
+        }, 2000);
 
-<header>
-    <script type="text/javascript">!function(e,t){var n=t.createElement("script");n.type="text/javascript",n.crossorigin="anonymous",n.async=!0,n.src="https://content.zeotap.com/sdk/zeotap.min.js",n.onload=function(){};var s=t.getElementsByTagName("script")[0];s.parentNode.insertBefore(n,s);function o(e,t,n){function s(t){e[t]=function(){e[n].push([t].concat(Array.prototype.slice.call(arguments,0)))}}for(var o=0;o<t.length;o++)s(t[o])}var r=e.zeotap||{_q:[],_qcmp:[]};o(r,["init","setEventProperties","setUserProperties","setPageProperties","setMetaProperties","setUserIdentities","unsetUserIdentites","setZI"],"_q"),o(r,["setConsent","addAskForConsentActionListener"],"_qcmp"),e.zeotap=r}(window,document);</script><script type="text/javascript">window.zeotap.init("564779d3-23f9-43d1-8b80-fa5bef1f4d43",{enableLogging:true, loadInteractScript:true});</script> 
-    
-    
+        window.zeoParamsCallback = function (targetingParameters) {
+            if (window.zeoParamsCallbackCalled) {
+            // Prevent multiple executions of the callback
+            return;
+            }
+            window.zeoParamsCallbackCalled = true;
+
+            // Save targeting parameters to localStorage
+            try {
+            localStorage.setItem('zeotaopKameleoonCustomData', btoa(JSON.stringify(targetingParameters)));
+            } catch (error) {
+            console.error('Error saving targeting parameters to localStorage:', error);
+            }
+
+            // Push targeting parameters to Kameleoon queue
+            Object.entries(targetingParameters).forEach(([key, value]) => {
+            if (value !== null && value !== undefined) {
+                console.log('Pushing to Kameleoon:', key, value);
+                window.kameleoonQueue.push(['Kameleoon.API.Data.setCustomData', key, value, true]);
+            }
+            });
+        };
+    </script>
+     
+    <script type="text/javascript">!function(e,t){var n=t.createElement("script");n.type="text/javascript",n.crossorigin="anonymous",n.async=!0,n.src="https://content.zeotap.com/sdk/zeotap.min.js",n.onload=function(){};var s=t.getElementsByTagName("script")[0];s.parentNode.insertBefore(n,s);function o(e,t,n){function s(t){e[t]=function(){e[n].push([t].concat(Array.prototype.slice.call(arguments,0)))}}for(var o=0;o<t.length;o++)s(t[o])}var r=e.zeotap||{_q:[],_qcmp:[]};o(r,["init","setEventProperties","setUserProperties","setPageProperties","setMetaProperties","setUserIdentities","unsetUserIdentites","setZI"],"_q"),o(r,["setConsent","addAskForConsentActionListener"],"_qcmp"),e.zeotap=r}(window,document);</script><script type="text/javascript">window.zeotap.init("8446a356-9ff0-4975-b4ca-7a70ad9d901e",{enableLogging:true, loadInteractScript:true});</script> 
 </header>
 <body>
     <div> Hello World </div>
-
     <script>
-        (function() {
-            window.kameleoonQueue = window.kameleoonQueue || [];
-            const originalPush = window.kameleoonQueue.push;
-            if (Array.isArray(window.kameleoonQueue)) {
-                console.log('kameleoonQueue is an array');
-                window.kameleoonQueue.forEach(args => {
-                    const logElement = document.createElement('div');
-                    logElement.textContent = 'kameleoonQueue existing value: ' + JSON.stringify(args);
-                    document.body.appendChild(logElement);
-                });
-            }
-            window.kameleoonQueue.push = function(...args) {
-                const logElement = document.createElement('div');
-                logElement.textContent = 'kameleoonQueue updated: ' + JSON.stringify(args);
-                document.body.appendChild(logElement);
-                return originalPush.apply(this, args);
-            };
-        })();
+        zeotap.setUserIdentities({"email":"random2@random.com"})
     </script>
 </body>
 <html>

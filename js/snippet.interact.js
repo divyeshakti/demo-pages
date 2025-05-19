@@ -101,7 +101,7 @@ preMain();
   }
 
   var params = getQueryParams();
-  if (params["mode"] !== "collect") return;
+  // if (params["mode"] !== "collect") return;
   var n = t.createElement("script");
   (n.type = "text/javascript"),
     (n.crossorigin = "anonymous"),
@@ -190,18 +190,11 @@ function main() {
   const writeKey = !!storage["writekey"]
     ? storage["writekey"]
     : getWriteKey(storage["env"] || "qa");
-  const mode = storage["mode"] || "default";
-  if (mode === "default") {
-    window.zeotapInteract.init(writeKey);
-  } else if (mode === "collect") {
     window.zeotap.init(writeKey,{
-      // loadInteractScript: ,
+      loadInteractScript:true ,
       debug:true,
     });
-    // window.zeotapInteract.init();
-    // window.zeotapInteract.init = window.zeotap.init;
-    // window.zeotapInteract.setUserIdentities = window.zeotap.setUserIdentities;
-  }
+ 
 }
 
 main();
