@@ -92,12 +92,13 @@ preMain();
       "https://content.zeotap.com/sdk/staging/zeotap.min.js" +
       `?v=${Date.now()}`;
     // src= "../js/staging/zeo/tap.min.js";
-  } else {
+  } else if(storage["env"]==="qa") {
     // src = "https://storage.googleapis.com/gcs-cdn-prod-eu/sdk/qa/zeotap.min.js";
     src =
-      "https://content.zeotap.com/sdk/qa/zeotap.min.js" + `?v=${Date.now()}`;
+      "https://storage.googleapis.com/gcs-cdn-prod-eu/sdk/qa/zeotap.min.js" + `?v=${Date.now()}`;
+  }else{
     // src = "../js/display/interact.min.js";
-    // src = "http://localhost:8081/zeotap.min.js";
+    src = "http://localhost:8081/zeotap.min.js";
   }
 
   var params = getQueryParams();
@@ -193,6 +194,9 @@ function main() {
     window.zeotap.init(writeKey,{
       loadInteractScript:true ,
       debug:true,
+      hashIdentities: false,      // Optional but good practice: Tell SDK NOT to hash again.
+      areIdentitiesHashed: true   // Crucial: Tells the SDK the values ARE pre-hashed.
+
     });
  
 }

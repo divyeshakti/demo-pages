@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Chart Widget Creator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chat-bubble {
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        .chat-bubble-user {
+            background-color: #3B82F6;
+            color: white;
+        }
+        .chat-bubble-ai {
+            background-color: #E5E7EB;
+            color: #1F2937;
+        }
+        /* Simple scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .code-block {
+            background-color: #1F2937;
+            color: #E5E7EB;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="flex flex-col h-screen">
+        <!-- Header -->
+        <header class="bg-white shadow-md p-4 z-10">
+            <div class="flex flex-col sm:flex-row justify-between sm:items-center">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">AI-Powered Chart Widget Creator POC</h1>
+                    <p class="text-sm text-gray-600">AI generates charts with configurations for standard UI controls.</p>
+                </div>
+                <!-- API Key Input Section -->
+                <div class="mt-4 sm:mt-0 sm:ml-4 flex-shrink-0">
+                    <label for="api-key-input" class="text-sm font-medium text-gray-700">Gemini API Key:</label>
+                    <div class="mt-1 flex rounded-md shadow-sm">
+                        <input type="password" id="api-key-input" class="flex-grow p-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="Enter your key">
+                        <button id="save-api-key-btn" class="bg-blue-600 text-white px-3 py-2 rounded-r-md text-sm font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Save</button>
+                    </div>
+                     <p id="api-key-status" class="text-xs mt-1 text-gray-500">No key saved for this session.</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-grow flex flex-col md:flex-row overflow-hidden">
+
+            <!-- Left Panel: Chat and Data Input -->
+            <div class="w-full md:w-1/3 flex flex-col bg-white border-r border-gray-200">
+                <!-- Data Input Section -->
+                <div class="p-4 border-b">
+                    <h3 class="font-semibold text-gray-800 mb-2">Data Input</h3>
+                    <textarea id="data-input" class="w-full h-32 p-2 border border-gray-300 rounded-md font-mono text-xs" placeholder="Paste your JSON data here..."></textarea>
+                    <div class="mt-2 flex space-x-2">
+                        <button id="use-time-series-btn" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-1 px-2 rounded-md">Use Time-Series Example</button>
+                        <button id="use-categorical-btn" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-1 px-2 rounded-md">Use Categorical Example</button>
+                    </div>
+                </div>
+
+                <!-- Chat Section -->
+                <div id="chat-history" class="flex-grow p-4 space-y-4 overflow-y-auto">
+                    <div class="flex justify-start">
+                        <div id="initial-message" class="chat-bubble chat-bubble-ai p-3 rounded-lg"></div>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50 border-t border-gray-200">
+                    <div class="flex items-center space-x-2">
+                        <input type="text" id="chat-input" class="flex-grow p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your API key first...">
+                        <button id="send-btn" class="bg-blue-600 text-white px-4 py-2 rounded-md font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400">
+                            Send
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Widget Preview and Code -->
+            <div class="w-full md:w-2/3 flex flex-col">
+                <div class="flex-grow p-6 overflow-y-auto">
+                    <div id="widget-container" class="bg-white p-6 rounded-xl shadow-lg">
+                        <h2 id="widget-title" class="text-xl font-bold mb-4 text-center">Widget Preview</h2>
+                        
+                        <div id="controls-container" class="mb-4 p-4 bg-gray-50 rounded-lg hidden">
+                            <h3 class="font-semibold text-gray-700 mb-2">Controls</h3>
+                            <div id="controls-host" class="space-y-4"></div>
+                        </div>
+
+                        <div id="loading-indicator" class="text-center py-8 hidden">
+                            <svg class="animate-spin h-8 w-8 text-blue-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <p class="mt-2 text-gray-600">AI is generating your widget...</p>
+                        </div>
+                        <div id="vis" class="w-full min-h-[300px] flex items-center justify-center bg-gray-50 rounded-lg">
+                            <p id="vis-placeholder" class="text-gray-500">Your generated chart will appear here.</p>
+                        </div>
+                    </div>
+
+                    <div id="code-container" class="mt-6 hidden">
+                        <div class="flex border-b border-gray-300">
+                            <button id="tab-html" class="tab-btn bg-white py-2 px-4 font-semibold border-t border-l border-r rounded-t-lg -mb-px">Embed Code</button>
+                            <button id="tab-json" class="tab-btn py-2 px-4 font-semibold text-gray-600">Vega-Lite JSON</button>
+                        </div>
+                        <div class="bg-white p-4 rounded-b-lg rounded-r-lg shadow-lg relative">
+                            <div id="html-content">
+                                <pre><code id="html-code" class="code-block"></code></pre>
+                            </div>
+                            <div id="json-content" class="hidden">
+                                <pre><code id="json-code" class="code-block"></code></pre>
+                            </div>
+                            <button id="copy-btn" class="absolute top-6 right-6 bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-1 px-2 rounded">Copy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        // --- DATA SIMULATION ---
+        const timeSeriesData = [
+            {"date": "2023-01-01", "value": 150}, {"date": "2023-01-02", "value": 175},
+            {"date": "2023-01-03", "value": 160}, {"date": "2023-01-04", "value": 190},
+            {"date": "2023-01-05", "value": 210}, {"date": "2023-01-06", "value": 200},
+            {"date": "2023-01-07", "value": 220}, {"date": "2023-01-08", "value": 240},
+            {"date": "2023-01-09", "value": 230}, {"date": "2023-01-10", "value": 255}
+        ];
+
+        const categoricalData = [
+            {"category": "Electronics", "value": 85000}, {"category": "Furniture", "value": 62000},
+            {"category": "Appliances", "value": 48000}, {"category": "Books", "value": 35000},
+            {"category": "Clothing", "value": 78000}, {"category": "Groceries", "value": 95000}
+        ];
+
+        // --- UI ELEMENT REFERENCES ---
+        const chatHistory = document.getElementById('chat-history');
+        const chatInput = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('send-btn');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const visContainer = document.getElementById('vis');
+        const widgetTitle = document.getElementById('widget-title');
+        const codeContainer = document.getElementById('code-container');
+        const htmlCode = document.getElementById('html-code');
+        const jsonCode = document.getElementById('json-code');
+        const copyBtn = document.getElementById('copy-btn');
+        const tabHtml = document.getElementById('tab-html');
+        const tabJson = document.getElementById('tab-json');
+        const htmlContent = document.getElementById('html-content');
+        const jsonContent = document.getElementById('json-content');
+        const apiKeyInput = document.getElementById('api-key-input');
+        const saveApiKeyBtn = document.getElementById('save-api-key-btn');
+        const apiKeyStatus = document.getElementById('api-key-status');
+        const initialMessage = document.getElementById('initial-message');
+        const controlsContainer = document.getElementById('controls-container');
+        const controlsHost = document.getElementById('controls-host');
+        const dataInput = document.getElementById('data-input');
+        const useTimeSeriesBtn = document.getElementById('use-time-series-btn');
+        const useCategoricalBtn = document.getElementById('use-categorical-btn');
+
+        let currentView = 'html';
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            updateApiKeyStatus();
+            setInitialMessage();
+        });
+
+        // --- EVENT LISTENERS ---
+        saveApiKeyBtn.addEventListener('click', () => {
+            const key = apiKeyInput.value.trim();
+            if (key) {
+                sessionStorage.setItem('geminiApiKey', key);
+                apiKeyInput.value = '';
+            }
+            updateApiKeyStatus();
+        });
+
+        useTimeSeriesBtn.addEventListener('click', () => {
+            dataInput.value = JSON.stringify(timeSeriesData, null, 2);
+        });
+
+        useCategoricalBtn.addEventListener('click', () => {
+            dataInput.value = JSON.stringify(categoricalData, null, 2);
+        });
+
+        sendBtn.addEventListener('click', handleSend);
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+            }
+        });
+
+        copyBtn.addEventListener('click', () => {
+            const codeToCopy = currentView === 'html' ? htmlCode.innerText : jsonCode.innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeToCopy;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+            copyBtn.innerText = 'Copied!';
+            setTimeout(() => { copyBtn.innerText = 'Copy'; }, 2000);
+        });
+        
+        tabHtml.addEventListener('click', () => switchTab('html'));
+        tabJson.addEventListener('click', () => switchTab('json'));
+
+        // --- FUNCTIONS ---
+
+        function sanitizeForId(text) {
+            if (!text) return '';
+            const sanitized = text.replace(/[^a-zA-Z0-9_]/g, '_');
+            return /^\d/.test(sanitized) ? `id_${sanitized}` : sanitized;
+        }
+        
+        function setInitialMessage() {
+            initialMessage.innerHTML = `
+                <p class="text-sm">Hello! Please enter your Gemini API key to begin.</p>
+                <p class="text-sm mt-2">1. Paste your JSON data into the text area above or use an example.</p>
+                <p class="text-sm mt-2">2. Ask me to create a chart with that data!</p>
+            `;
+        }
+
+        function updateApiKeyStatus() {
+            const key = sessionStorage.getItem('geminiApiKey');
+            if (key) {
+                apiKeyStatus.textContent = 'API Key is saved for this session.';
+                apiKeyStatus.style.color = '#10B981';
+                chatInput.disabled = false;
+                sendBtn.disabled = false;
+                chatInput.placeholder = 'Describe the chart and controls you want...';
+            } else {
+                apiKeyStatus.textContent = 'No key saved for this session.';
+                apiKeyStatus.style.color = '#6B7280';
+                chatInput.disabled = true;
+                sendBtn.disabled = true;
+                chatInput.placeholder = 'Enter your API key first...';
+            }
+        }
+
+        function switchTab(view) {
+            currentView = view;
+            tabHtml.classList.toggle('bg-white', view === 'html');
+            tabHtml.classList.toggle('border-t', view === 'html');
+            tabHtml.classList.toggle('border-l', view === 'html');
+            tabHtml.classList.toggle('border-r', view === 'html');
+            tabHtml.classList.toggle('-mb-px', view === 'html');
+            tabHtml.classList.toggle('text-gray-600', view !== 'html');
+            
+            tabJson.classList.toggle('bg-white', view === 'json');
+            tabJson.classList.toggle('border-t', view === 'json');
+            tabJson.classList.toggle('border-l', view === 'json');
+            tabJson.classList.toggle('border-r', view === 'json');
+            tabJson.classList.toggle('-mb-px', view === 'json');
+            tabJson.classList.toggle('text-gray-600', view !== 'json');
+
+            htmlContent.classList.toggle('hidden', view !== 'html');
+            jsonContent.classList.toggle('hidden', view !== 'json');
+        }
+
+        function appendMessage(text, sender) {
+            const bubble = document.createElement('div');
+            bubble.className = `chat-bubble p-3 rounded-lg ${sender === 'user' ? 'chat-bubble-user self-end' : 'chat-bubble-ai self-start'}`;
+            bubble.innerHTML = `<p class="text-sm">${text.replace(/\n/g, '<br>')}</p>`;
+            
+            const messageWrapper = document.createElement('div');
+            messageWrapper.className = 'flex ' + (sender === 'user' ? 'justify-end' : 'justify-start');
+            messageWrapper.appendChild(bubble);
+
+            chatHistory.appendChild(messageWrapper);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+
+        async function handleSend() {
+            const userInput = chatInput.value.trim();
+            if (!userInput) return;
+            
+            if (!sessionStorage.getItem('geminiApiKey')) {
+                appendMessage("Please save your Gemini API key before sending a message.", 'ai');
+                return;
+            }
+
+            const userData = dataInput.value.trim();
+            if (!userData) {
+                appendMessage("Please provide some data in the 'Data Input' text area first.", 'ai');
+                return;
+            }
+            try {
+                JSON.parse(userData);
+            } catch (e) {
+                appendMessage(`The data in the 'Data Input' is not valid JSON. Please correct it.\n\nError: ${e.message}`, 'ai');
+                return;
+            }
+
+
+            appendMessage(userInput, 'user');
+            chatInput.value = '';
+            setLoading(true);
+
+            try {
+                const aiResponse = await getAiGeneratedChart(userInput, userData);
+                renderWidget(aiResponse);
+            } catch (error) {
+                console.error("Error during AI widget generation:", error);
+                const errorMessage = `Sorry, I encountered an error and couldn't generate the chart.\n\n**Details:**\n${error.message}`;
+                appendMessage(errorMessage, 'ai');
+                resetUiToInitialState();
+            } finally {
+                setLoading(false);
+            }
+        }
+        
+        function resetUiToInitialState() {
+            visContainer.innerHTML = '<p id="vis-placeholder" class="text-gray-500">Your generated chart will appear here.</p>';
+            visContainer.classList.add('flex', 'items-center', 'justify-center');
+            widgetTitle.innerText = "Widget Preview";
+            codeContainer.classList.add('hidden');
+            controlsContainer.classList.add('hidden');
+            controlsHost.innerHTML = '';
+        }
+
+        function setLoading(isLoading) {
+            const keyPresent = !!sessionStorage.getItem('geminiApiKey');
+            chatInput.disabled = isLoading || !keyPresent;
+            sendBtn.disabled = isLoading || !keyPresent;
+
+            loadingIndicator.classList.toggle('hidden', !isLoading);
+            visContainer.classList.toggle('hidden', isLoading);
+            if (isLoading) {
+                resetUiToInitialState();
+            }
+        }
+
+        async function getAiGeneratedChart(prompt, jsonData) {
+            const systemPrompt = `
+                You are an expert in data visualization using Vega-Lite. Your task is to generate a valid Vega-Lite JSON specification and a list of control configurations based on a user's request and provided JSON data.
+
+                **Core Task:**
+                1.  Analyze the user's request and the provided JSON data to determine the chart type and any desired controls.
+                2.  Create a complete Vega-Lite specification. The \`data\` property should be an empty object \`{}\` as the application will inject the data.
+                3.  For each requested control, you MUST add a corresponding \`param\` to the Vega-Lite spec. This \`param\` should **NOT** have a "bind" property but **MUST** have a \`name\` and an initial \`value\`.
+                4.  You MUST then use that \`param\` in the spec, for example in a \`transform\` block for filtering, or a \`condition\` for encoding.
+                5.  You MUST also return a \`controls\` array. Each object in this array describes one UI control that the application will build.
+
+                **Supported Controls & Examples:**
+
+                * **Dropdown Filter (select):**
+                    * User asks: "...with a dropdown to filter."
+                    * \`param\` to add: \`{"name": "some_field_filter", "value": null}\`
+                    * Usage in spec: \`"transform": [{"filter": "some_field_filter == null || datum.some_field == some_field_filter"}]\`
+                    * \`controls\` object to return: \`{"type": "select", "label": "Filter by Some Field:", "signal": "some_field_filter", "field": "some_field"}\`
+
+                * **Range Slider (range):**
+                    * User asks: "...with a slider to filter."
+                    * \`param\` to add: \`{"name": "some_value_slider", "value": 50}\`
+                    * Usage in spec: \`"transform": [{"filter": "datum.some_value >= some_value_slider"}]\`
+                    * \`controls\` object to return: \`{"type": "range", "label": "Minimum Value:", "signal": "some_value_slider", "field": "some_value"}\` (The app will calculate min/max/step).
+
+                * **Date Range Filter (daterange):**
+                    * User asks: "...and filter by a date range."
+                    * \`param\` to add: \`[{"name": "start_date_signal", "value": 1672531200000}, {"name": "end_date_signal", "value": 1673308800000}]\` (These are example timestamps for Jan 1 and Jan 10 2023. You should infer the actual min/max from the data for the initial values).
+                    * Usage in spec: \`"transform": [{"filter": "toDate(datum.date) >= toDate(start_date_signal) && toDate(datum.date) <= toDate(end_date_signal)"}]\`
+                    * \`controls\` object to return: \`{"type": "daterange", "label": "Date Range:", "startSignal": "start_date_signal", "endSignal": "end_date_signal", "field": "date"}\`
+
+                **Output Format:**
+                You MUST respond with ONLY a single, valid JSON object in the following format. If no controls are requested, the \`controls\` key should be an empty array \`[]\`.
+                {
+                  "chartTitle": "A short, descriptive title for the chart",
+                  "vegaLiteSpec": { ... your vega-lite json with params ... },
+                  "controls": [ ... array of control configuration objects ... ]
+                }
+            `;
+            
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: systemPrompt + "\n\nUser Request: " + prompt + "\n\nJSON Data:\n" + jsonData }] });
+            const payload = { contents: chatHistory };
+            const apiKey = sessionStorage.getItem('geminiApiKey');
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errorBody = await response.text();
+                throw new Error(`API request failed with status ${response.status}: ${errorBody}`);
+            }
+
+            const result = await response.json();
+
+            if (result.candidates && result.candidates.length > 0 &&
+                result.candidates[0].content && result.candidates[0].content.parts &&
+                result.candidates[0].content.parts.length > 0) {
+                
+                let text = result.candidates[0].content.parts[0].text;
+                text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+                
+                try {
+                    return JSON.parse(text);
+                } catch(e) {
+                    console.error("Failed to parse AI response JSON:", e);
+                    console.error("Raw AI response text:", text);
+                    throw new Error("AI returned invalid JSON. See console for the raw response.");
+                }
+
+            } else {
+                console.error("Unexpected AI response structure:", result);
+                throw new Error("Could not get a valid response from the AI. See console for details.");
+            }
+        }
+
+        function renderWidget(response) {
+            const { chartTitle, vegaLiteSpec, controls } = response;
+            const dataValues = JSON.parse(dataInput.value);
+            vegaLiteSpec.data = { values: dataValues };
+
+            visContainer.innerHTML = ''; 
+            visContainer.classList.remove('flex', 'items-center', 'justify-center');
+            
+            let allControlsHTML = '';
+            const activeControls = [];
+
+            controlsHost.innerHTML = '';
+            if (controls && controls.length > 0) {
+                controls.forEach(control => {
+                    // For daterange, check both signals
+                    const signalsInSpec = control.type === 'daterange'
+                        ? vegaLiteSpec.params?.some(p => p.name === control.startSignal) && vegaLiteSpec.params?.some(p => p.name === control.endSignal)
+                        : vegaLiteSpec.params?.some(p => p.name === control.signal);
+
+                    if (!signalsInSpec) {
+                        console.error(`Control for signal(s) requested, but not all signals found in spec. Skipping control:`, control);
+                        return;
+                    }
+
+                    let controlHTML = '';
+
+                    switch (control.type) {
+                        case 'select':
+                            const controlIdSelect = sanitizeForId(control.signal);
+                            const options = control.options || [...new Set(dataValues.map(item => item[control.field]))];
+                            const optionsHTML = options.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+                            controlHTML = `
+                                <div>
+                                    <label for="${controlIdSelect}" class="block text-sm font-medium text-gray-700">${control.label}</label>
+                                    <select id="${controlIdSelect}" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                        <option value="">All</option>
+                                        ${optionsHTML}
+                                    </select>
+                                </div>
+                            `;
+                            break;
+                        case 'range':
+                            const controlIdRange = sanitizeForId(control.signal);
+                            const rangeValues = dataValues.map(d => d[control.field]);
+                            const minRange = Math.min(...rangeValues);
+                            const maxRange = Math.max(...rangeValues);
+                            const stepRange = (maxRange - minRange) / 100;
+                             controlHTML = `
+                                <div>
+                                    <label for="${controlIdRange}" class="block text-sm font-medium text-gray-700">${control.label} <span id="${controlIdRange}-value">${minRange}</span></label>
+                                    <input type="range" id="${controlIdRange}" min="${minRange}" max="${maxRange}" step="${stepRange}" value="${minRange}" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                                </div>
+                            `;
+                            break;
+                        case 'daterange':
+                            const controlIdStart = sanitizeForId(control.startSignal);
+                            const controlIdEnd = sanitizeForId(control.endSignal);
+                            const dateObjects = dataValues.map(d => new Date(d[control.field]));
+                            const minDate = new Date(Math.min.apply(null, dateObjects)).toISOString().split('T')[0];
+                            const maxDate = new Date(Math.max.apply(null, dateObjects)).toISOString().split('T')[0];
+                            controlHTML = `
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">${control.label}</label>
+                                    <div class="flex items-center space-x-2 mt-1">
+                                        <input type="date" id="${controlIdStart}" value="${minDate}" class="w-full p-1 border-gray-300 rounded-md text-sm">
+                                        <span class="text-gray-500">to</span>
+                                        <input type="date" id="${controlIdEnd}" value="${maxDate}" class="w-full p-1 border-gray-300 rounded-md text-sm">
+                                    </div>
+                                </div>
+                            `;
+                            break;
+                    }
+                    if (controlHTML) {
+                        allControlsHTML += controlHTML;
+                        activeControls.push(control);
+                    }
+                });
+
+                if (allControlsHTML) {
+                    controlsHost.innerHTML = allControlsHTML;
+                    controlsContainer.classList.remove('hidden');
+                } else {
+                    controlsContainer.classList.add('hidden');
+                }
+
+            } else {
+                 controlsContainer.classList.add('hidden');
+            }
+
+            vegaEmbed('#vis', vegaLiteSpec, { actions: true })
+                .then(result => {
+                    const vegaView = result.view;
+                    activeControls.forEach(control => {
+                        if (control.type === 'daterange') {
+                            const startEl = document.getElementById(sanitizeForId(control.startSignal));
+                            const endEl = document.getElementById(sanitizeForId(control.endSignal));
+                            if (startEl) {
+                                startEl.addEventListener('change', (e) => vegaView.signal(control.startSignal, new Date(e.target.value).getTime()).run());
+                            }
+                            if (endEl) {
+                                endEl.addEventListener('change', (e) => vegaView.signal(control.endSignal, new Date(e.target.value).getTime()).run());
+                            }
+                        } else {
+                            const controlId = sanitizeForId(control.signal);
+                            const controlElement = document.getElementById(controlId);
+                            
+                            if (controlElement) {
+                                const eventType = control.type === 'range' ? 'input' : 'change';
+                                controlElement.addEventListener(eventType, (event) => {
+                                    let value = event.target.value;
+                                    if (control.type === 'select') {
+                                        value = value === "" ? null : value;
+                                    } else if (control.type === 'range') {
+                                        value = parseFloat(value);
+                                        const valueSpan = document.getElementById(`${controlId}-value`);
+                                        if(valueSpan) valueSpan.textContent = value.toFixed(2);
+                                    }
+                                    vegaView.signal(control.signal, value).run();
+                                });
+                            }
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error("Vega-Embed Error:", error);
+                    visContainer.innerHTML = '<p class="text-red-500 font-semibold">Failed to render chart. Check console for details.</p>';
+                    visContainer.classList.add('flex', 'items-center', 'justify-center');
+                });
+
+            widgetTitle.innerText = chartTitle;
+
+            const prettyJson = JSON.stringify(vegaLiteSpec, null, 2);
+            jsonCode.textContent = prettyJson;
+            
+            // --- Embed Code Generation ---
+            const widgetId = "widget_" + Date.now();
+            const visContainerId = `vis_${widgetId}`;
+            let embedControlsHTML = '';
+            let embedScripts = '';
+
+            activeControls.forEach((control, index) => {
+                let currentControlHTML = '';
+                if (control.type === 'daterange') {
+                    const embedStartId = `ctrl_start_${index}_${widgetId}`;
+                    const embedEndId = `ctrl_end_${index}_${widgetId}`;
+                    const dateObjects = dataValues.map(d => new Date(d[control.field]));
+                    const minDate = new Date(Math.min.apply(null, dateObjects)).toISOString().split('T')[0];
+                    const maxDate = new Date(Math.max.apply(null, dateObjects)).toISOString().split('T')[0];
+                    currentControlHTML = `
+                        <div>
+                            <label>${control.label}</label>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="date" id="${embedStartId}" value="${minDate}">
+                                <span>to</span>
+                                <input type="date" id="${embedEndId}" value="${maxDate}">
+                            </div>
+                        </div>
+                    `;
+                    embedScripts += `
+                        const startEl_${index} = document.getElementById('${embedStartId}');
+                        if(startEl_${index}) startEl_${index}.addEventListener('change', (e) => vegaView.signal('${control.startSignal}', new Date(e.target.value).getTime()).run());
+                        const endEl_${index} = document.getElementById('${embedEndId}');
+                        if(endEl_${index}) endEl_${index}.addEventListener('change', (e) => vegaView.signal('${control.endSignal}', new Date(e.target.value).getTime()).run());
+                    `;
+                } else {
+                    const embedControlId = `ctrl_${index}_${widgetId}`;
+                    switch (control.type) {
+                        case 'select':
+                            const options = control.options || [...new Set(dataValues.map(item => item[control.field]))];
+                            const optionsHTML = options.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+                            currentControlHTML = `
+                                <div>
+                                    <label for="${embedControlId}">${control.label}</label>
+                                    <select id="${embedControlId}">
+                                        <option value="">All</option>
+                                        ${optionsHTML}
+                                    </select>
+                                </div>
+                            `;
+                            break;
+                        case 'range':
+                            const values = dataValues.map(d => d[control.field]);
+                            const min = Math.min(...values);
+                            const max = Math.max(...values);
+                            const step = (max - min) / 100;
+                            currentControlHTML = `
+                                <div>
+                                    <label for="${embedControlId}">${control.label} <span id="${embedControlId}-value">${min}</span></label>
+                                    <input type="range" id="${embedControlId}" min="${min}" max="${max}" step="${step}" value="${min}">
+                                </div>
+                            `;
+                            break;
+                    }
+                    const eventType = control.type === 'range' ? 'input' : 'change';
+                    embedScripts += `
+                        const ctrl_${index} = document.getElementById('${embedControlId}');
+                        if (ctrl_${index}) {
+                            ctrl_${index}.addEventListener('${eventType}', (event) => {
+                                let value = event.target.value;
+                                if ('${control.type}' === 'select') {
+                                    value = value === "" ? null : value;
+                                } else if ('${control.type}' === 'range') {
+                                    value = parseFloat(value);
+                                    const valueSpan = document.getElementById('${embedControlId}-value');
+                                    if(valueSpan) valueSpan.textContent = value;
+                                }
+                                vegaView.signal('${control.signal}', value).run();
+                            });
+                        }
+                    `;
+                }
+                embedControlsHTML += currentControlHTML;
+            });
+
+
+            const embedHtml = 
+`<!-- 1. Add containers for controls and the chart -->
+<div id="controls_${widgetId}" style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1rem;">
+${embedControlsHTML}
+</div>
+<div id="${visContainerId}"></div>
+
+<!-- 2. Add the script to render and connect everything -->
+<script>
+    (function() {
+        // The data is now included in the script
+        const dataValues = ${JSON.stringify(dataValues, null, 2)};
+        const spec = ${JSON.stringify(vegaLiteSpec, null, 2)};
+        spec.data = { values: dataValues }; // Inject data into the spec
+        
+        let vegaView; // To hold the view object
+
+        vegaEmbed('#${visContainerId}', spec, { actions: true })
+            .then(result => {
+                vegaView = result.view;
+                
+                // Connect external controls
+                ${embedScripts}
+            })
+            .catch(console.error);
+    })();
+<\/script>`;
+            
+            htmlCode.textContent = embedHtml;
+            codeContainer.classList.remove('hidden');
+            switchTab('html');
+        }
+
+    </script>
+</body>
+</html>

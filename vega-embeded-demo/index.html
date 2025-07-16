@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple HTML Page</title>
+     <title>AI-Powered Chart Widget Creator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<!-- 1. Add containers for controls and the chart -->
+<!-- 1. Add containers for controls and the chart -->
+<div id="controls_widget_1751967424201" style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1rem;">
+
+                        <div>
+                            <label>Date Range:</label>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="date" id="ctrl_start_0_widget_1751967424201" value="2023-01-01">
+                                <span>to</span>
+                                <input type="date" id="ctrl_end_0_widget_1751967424201" value="2023-01-10">
+                            </div>
+                        </div>
+                    
+</div>
+<div id="vis_widget_1751967424201"></div>
+
+<!-- 2. Add the script to render and connect everything -->
+<script>
+    (function() {
+        // The data is now included in the script
+        const dataValues = [
+  {
+    "date": "2023-01-01",
+    "value": 150
+  },
+  {
+    "date": "2023-01-02",
+    "value": 175
+  },
+  {
+    "date": "2023-01-03",
+    "value": 160
+  },
+  {
+    "date": "2023-01-04",
+    "value": 190
+  },
+  {
+    "date": "2023-01-05",
+    "value": 210
+  },
+  {
+    "date": "2023-01-06",
+    "value": 200
+  },
+  {
+    "date": "2023-01-07",
+    "value": 220
+  },
+  {
+    "date": "2023-01-08",
+    "value": 240
+  },
+  {
+    "date": "2023-01-09",
+    "value": 230
+  },
+  {
+    "date": "2023-01-10",
+    "value": 255
+  }
+];
+        const spec = {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "A line chart showing value over time with a date range filter.",
+  "data": {
+    "values": [
+      {
+        "date": "2023-01-01",
+        "value": 150
+      },
+      {
+        "date": "2023-01-02",
+        "value": 175
+      },
+      {
+        "date": "2023-01-03",
+        "value": 160
+      },
+      {
+        "date": "2023-01-04",
+        "value": 190
+      },
+      {
+        "date": "2023-01-05",
+        "value": 210
+      },
+      {
+        "date": "2023-01-06",
+        "value": 200
+      },
+      {
+        "date": "2023-01-07",
+        "value": 220
+      },
+      {
+        "date": "2023-01-08",
+        "value": 240
+      },
+      {
+        "date": "2023-01-09",
+        "value": 230
+      },
+      {
+        "date": "2023-01-10",
+        "value": 255
+      }
+    ]
+  },
+  "params": [
+    {
+      "name": "start_date_signal",
+      "value": 1672531200000
+    },
+    {
+      "name": "end_date_signal",
+      "value": 1673308800000
+    }
+  ],
+  "transform": [
+    {
+      "filter": "toDate(datum.date) >= toDate(start_date_signal) && toDate(datum.date) <= toDate(end_date_signal)"
+    }
+  ],
+  "mark": "line",
+  "encoding": {
+    "x": {
+      "field": "date",
+      "type": "temporal",
+      "title": "Date"
+    },
+    "y": {
+      "field": "value",
+      "type": "quantitative",
+      "title": "Value"
+    }
+  }
+};
+        spec.data = { values: dataValues }; // Inject data into the spec
+        
+        let vegaView; // To hold the view object
+
+        vegaEmbed('#vis_widget_1751967424201', spec, { actions: true })
+            .then(result => {
+                vegaView = result.view;
+                
+                // Connect external controls
+                
+                        const startEl_0 = document.getElementById('ctrl_start_0_widget_1751967424201');
+                        if(startEl_0) startEl_0.addEventListener('change', (e) => vegaView.signal('start_date_signal', new Date(e.target.value).getTime()).run());
+                        const endEl_0 = document.getElementById('ctrl_end_0_widget_1751967424201');
+                        if(endEl_0) endEl_0.addEventListener('change', (e) => vegaView.signal('end_date_signal', new Date(e.target.value).getTime()).run());
+                    
+            })
+            .catch(console.error);
+    })();
+</script>
+
+<!-- 1. Add containers for controls and the chart -->
+<div id="controls_widget_1751969610863" style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1rem;">
+
+                        <div>
+                            <label>Date Range:</label>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="date" id="ctrl_start_0_widget_1751969610863" value="2023-12-01">
+                                <span>to</span>
+                                <input type="date" id="ctrl_end_0_widget_1751969610863" value="2024-01-10">
+                            </div>
+                        </div>
+                    
+</div>
+<div id="vis_widget_1751969610863"></div>
+
+<!-- 2. Add the script to render and connect everything -->
+<script>
+    (function() {
+        // The data is now included in the script
+        const dataValues = [
+  {
+    "date": "2023-12-01",
+    "value": 150
+  },
+  {
+    "date": "2023-12-02",
+    "value": 175
+  },
+  {
+    "date": "2023-12-03",
+    "value": 160
+  },
+  {
+    "date": "2023-12-04",
+    "value": 190
+  },
+  {
+    "date": "2023-12-05",
+    "value": 210
+  },
+  {
+    "date": "2023-12-06",
+    "value": 200
+  },
+  {
+    "date": "2023-12-07",
+    "value": 220
+  },
+  {
+    "date": "2023-12-08",
+    "value": 240
+  },
+  {
+    "date": "2024-01-09",
+    "value": 230
+  },
+  {
+    "date": "2024-01-10",
+    "value": 255
+  }
+];
+        const spec = {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "A simple bar chart with a date range filter.",
+  "data": {
+    "values": [
+      {
+        "date": "2023-12-01",
+        "value": 150
+      },
+      {
+        "date": "2023-12-02",
+        "value": 175
+      },
+      {
+        "date": "2023-12-03",
+        "value": 160
+      },
+      {
+        "date": "2023-12-04",
+        "value": 190
+      },
+      {
+        "date": "2023-12-05",
+        "value": 210
+      },
+      {
+        "date": "2023-12-06",
+        "value": 200
+      },
+      {
+        "date": "2023-12-07",
+        "value": 220
+      },
+      {
+        "date": "2023-12-08",
+        "value": 240
+      },
+      {
+        "date": "2024-01-09",
+        "value": 230
+      },
+      {
+        "date": "2024-01-10",
+        "value": 255
+      }
+    ]
+  },
+  "params": [
+    {
+      "name": "start_date_signal",
+      "value": 1701388800000
+    },
+    {
+      "name": "end_date_signal",
+      "value": 1704844800000
+    }
+  ],
+  "transform": [
+    {
+      "filter": "toDate(datum.date) >= toDate(start_date_signal) && toDate(datum.date) <= toDate(end_date_signal)"
+    }
+  ],
+  "mark": "bar",
+  "encoding": {
+    "x": {
+      "field": "date",
+      "type": "temporal",
+      "title": "Date"
+    },
+    "y": {
+      "field": "value",
+      "type": "quantitative",
+      "title": "Value"
+    }
+  }
+};
+        spec.data = { values: dataValues }; // Inject data into the spec
+        
+        let vegaView; // To hold the view object
+
+        vegaEmbed('#vis_widget_1751969610863', spec, { actions: true })
+            .then(result => {
+                vegaView = result.view;
+                
+                // Connect external controls
+                
+                        const startEl_0 = document.getElementById('ctrl_start_0_widget_1751969610863');
+                        if(startEl_0) startEl_0.addEventListener('change', (e) => vegaView.signal('start_date_signal', new Date(e.target.value).getTime()).run());
+                        const endEl_0 = document.getElementById('ctrl_end_0_widget_1751969610863');
+                        if(endEl_0) endEl_0.addEventListener('change', (e) => vegaView.signal('end_date_signal', new Date(e.target.value).getTime()).run());
+                    
+            })
+            .catch(console.error);
+    })();
+</script>
+
+</body>
